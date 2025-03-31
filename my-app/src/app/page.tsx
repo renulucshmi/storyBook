@@ -167,7 +167,7 @@ export default function PolaroidPhotoAlbum() {
                     />
                     
                     {/* Picture Area */}
-                    <div className="relative w-full aspect-square mb-2 overflow-hidden">
+                    <div className="relative w-full aspect-square mb-2 overflow-hidden" style={{ position: 'relative', width: '100%', height: '0', paddingBottom: '100%' }}>
                       <Image
                         src={image.src}
                         alt={image.alt}
@@ -211,7 +211,7 @@ export default function PolaroidPhotoAlbum() {
             className="relative max-w-4xl max-h-screen"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative w-full h-[80vh]">
+            <div className="relative w-full h-[80vh]" style={{ position: 'relative', width: '100%', height: '80vh' }}>
               <Image
                 src={selectedImage.src}
                 alt={selectedImage.alt}
