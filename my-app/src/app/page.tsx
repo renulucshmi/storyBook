@@ -16,8 +16,8 @@ export default function PolaroidPhotoAlbum() {
     alt: `Ghibli moment ${i + 1}`,
     // Random rotation for hanging effect (-5 to 5 degrees)
     rotation: Math.floor(Math.random() * 11) - 5,
-    // Smaller vertical position variation (0-15px) to reduce gaps
-    yOffset: Math.floor(Math.random() * 15)
+    // Vertical position variation (0-30px)
+    yOffset: Math.floor(Math.random() * 30)
   }));
 
   useEffect(() => {
@@ -125,34 +125,33 @@ export default function PolaroidPhotoAlbum() {
       <main className="container mx-auto px-4 py-12 relative z-20">
         {imagesLoaded ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from({ length: Math.ceil(images.length / 6) }).map((_, stringIndex) => (
+            {Array.from({ length: Math.ceil(images.length / 4) }).map((_, stringIndex) => (
               <div key={`string-${stringIndex}`} className="relative">
                 {/* Vertical LED String */}
                 <div className="absolute h-full w-1 bg-yellow-100 left-1/2 transform -translate-x-1/2 z-10"></div>
                 
                 {/* LED Bulbs */}
-                {Array.from({ length: 12 }).map((_, bulbIndex) => (
+                {Array.from({ length: 8 }).map((_, bulbIndex) => (
                   <div 
                     key={`bulb-${stringIndex}-${bulbIndex}`}
                     className="absolute w-4 h-4 rounded-full bg-yellow-300 left-1/2 transform -translate-x-1/2 z-20 animate-pulse"
                     style={{
-                      top: `${(bulbIndex * 8.3)}%`,
+                      top: `${(bulbIndex * 12.5)}%`,
                       boxShadow: '0 0 10px 2px rgba(255, 255, 0, 0.5)'
                     }}
                   />
                 ))}
 
                 {/* Polaroid Photos on this string */}
-                {images.slice(stringIndex * 6, (stringIndex + 1) * 6).map((image, index) => (
+                {images.slice(stringIndex * 4, (stringIndex + 1) * 4).map((image, index) => (
                   <motion.div
                     key={image.id}
-                    className="relative bg-white rounded p-3 pt-3 pb-12 shadow-lg mx-auto mb-8 cursor-pointer"
+                    className="relative bg-white rounded p-3 pt-3 pb-12 shadow-lg mx-auto mb-16 cursor-pointer"
                     style={{
                       width: '85%',
                       maxWidth: '300px',
                       transform: `rotate(${image.rotation}deg)`,
-                      // Reduced spacing between photos
-                      marginTop: `${image.yOffset + index * 120}px`,
+                      marginTop: `${image.yOffset + index * 220}px`,
                       zIndex: 30
                     }}
                     initial={{ opacity: 0, y: 20 }}
