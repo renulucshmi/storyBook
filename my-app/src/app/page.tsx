@@ -223,7 +223,7 @@ export default function PolaroidPhotoAlbum() {
               </motion.p>
             </div>
             
-            <p className="text-teal-700 italic mt-2">Memories we've made together in our magical world</p>
+            <p className="text-teal-700 italic mt-2">Memories we&apos;ve made together in our magical world</p>
           </motion.div>
         </div>
       </header>
