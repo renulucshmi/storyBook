@@ -1,4 +1,3 @@
-// app/page.jsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,8 +8,8 @@ export default function PolaroidPhotoAlbum() {
   const [selectedImage, setSelectedImage] = useState<{ id: number; src: string; alt: string; rotation: number; yOffset: number } | null>(null);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   
-  // Generate array of 100 images
-  const images = Array.from({ length: 100 }, (_, i) => ({
+  // Generate array of 66 images
+  const images = Array.from({ length: 66 }, (_, i) => ({
     id: i + 1,
     src: `/images/${i + 1}.png`,
     alt: `Ghibli moment ${i + 1}`,
@@ -65,6 +64,24 @@ export default function PolaroidPhotoAlbum() {
     setSelectedImage(null);
     document.body.style.overflow = 'auto';
   };
+
+  // Helper function to distribute images evenly across columns
+  const distributeImagesToColumns = (images: { id: number; src: string; alt: string; rotation: number; yOffset: number }[], columnCount: number): { id: number; src: string; alt: string; rotation: number; yOffset: number }[][] => {
+    // Create array of column arrays
+    const columns: { id: number; src: string; alt: string; rotation: number; yOffset: number }[][] = Array.from({ length: columnCount }, () => []);
+    
+    // Distribute images evenly
+    images.forEach((image: { id: number; src: string; alt: string; rotation: number; yOffset: number }, index: number) => {
+      const columnIndex = index % columnCount;
+      columns[columnIndex].push(image);
+    });
+    
+    return columns;
+  };
+
+  // Distribute images into 3 columns (or 2/1 based on screen size)
+  const columnCount = 3; // We'll handle responsive behavior with grid
+  const imageColumns = distributeImagesToColumns(images, columnCount);
 
   return (
     <div className="min-h-screen bg-blue-50 relative overflow-hidden">
@@ -149,29 +166,30 @@ export default function PolaroidPhotoAlbum() {
         </div>
       </header>
 
-      {/* String Lights and Photos */}
+      {/* String Lights and Photos - Using the new distribution method */}
       <main className="container mx-auto px-4 py-12 relative z-20">
         {imagesLoaded ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from({ length: Math.ceil(images.length / 6) }).map((_, stringIndex) => (
-              <div key={`string-${stringIndex}`} className="relative">
+            {/* Create a column for each distributed image set */}
+            {imageColumns.map((columnImages, columnIndex) => (
+              <div key={`column-${columnIndex}`} className="relative">
                 {/* Vertical LED String */}
-                <div className="absolute h-full w-1 bg-teal-100 left-1/2 transform -translate-x-1/2 z-10"></div>
+                <div className="absolute h-full w-1 bg-yellow-100 left-1/2 transform -translate-x-1/2 z-10"></div>
                 
-                {/* LED Bulbs */}
+                {/* LED Bulbs - changed to yellow */}
                 {Array.from({ length: 12 }).map((_, bulbIndex) => (
                   <div 
-                    key={`bulb-${stringIndex}-${bulbIndex}`}
-                    className="absolute w-4 h-4 rounded-full bg-teal-300 left-1/2 transform -translate-x-1/2 z-20 animate-pulse"
+                    key={`bulb-${columnIndex}-${bulbIndex}`}
+                    className="absolute w-4 h-4 rounded-full bg-yellow-300 left-1/2 transform -translate-x-1/2 z-20 animate-pulse"
                     style={{
                       top: `${(bulbIndex * 8.3)}%`,
-                      boxShadow: '0 0 10px 2px rgba(129, 226, 213, 0.6)'
+                      boxShadow: '0 0 10px 2px rgba(255, 217, 102, 0.6)' // Yellow glow
                     }}
                   />
                 ))}
 
-                {/* Polaroid Photos on this string */}
-                {images.slice(stringIndex * 6, (stringIndex + 1) * 6).map((image, index) => (
+                {/* Polaroid Photos in this column */}
+                {columnImages.map((image: { id: number; src: string; alt: string; rotation: number; yOffset: number }, index) => (
                   <motion.div
                     key={image.id}
                     className="relative bg-white rounded p-3 pt-3 pb-12 shadow-lg mx-auto mb-8 cursor-pointer"
@@ -179,7 +197,7 @@ export default function PolaroidPhotoAlbum() {
                       width: '85%',
                       maxWidth: '300px',
                       transform: `rotate(${image.rotation}deg)`,
-                      marginTop: `${image.yOffset + index * 120}px`,
+                      marginTop: index === 0 ? '0' : `${image.yOffset + 100}px`,
                       zIndex: 30
                     }}
                     initial={{ opacity: 0, y: 20 }}
