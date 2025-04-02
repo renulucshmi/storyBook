@@ -203,12 +203,12 @@ export default function PolaroidPhotoAlbum() {
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <h1 className="text-4xl md:text-5xl text-center font-serif text-teal-800 mb-6">
-              <span className="relative inline-block">
-                <span className="relative z-10">Our Ghibli Journey 🌿</span>
-                <span className="absolute -bottom-1 left-0 w-full h-3 bg-teal-200 opacity-50 rounded-lg z-0"></span>
-              </span>
-            </h1>
+           <h1 className="text-4xl md:text-5xl text-center font-serif text-teal-800 mb-6">
+  <span className="relative inline-block">
+    <span className="relative z-10">Our Ghibli Journey ✨</span>
+    <span className="absolute -bottom-1 left-0 w-full h-3 bg-teal-200 opacity-50 rounded-lg z-0"></span>
+  </span>
+</h1>
             
             <div className="relative inline-block px-8 py-4 mb-4 bg-white rounded-lg shadow-lg transform rotate-1">
               <div className="absolute -top-3 -left-3 w-8 h-8 text-2xl">🎂</div>
