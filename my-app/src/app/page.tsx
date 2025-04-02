@@ -5,20 +5,12 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 export default function PolaroidPhotoAlbum() {
-  const [selectedImage, setSelectedImage] = useState<ImageType | null>(null);
+  const [selectedImage, setSelectedImage] = useState<{ id: number; src: string; alt: string; } | null>(null);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [showPopup, setShowPopup] = useState(true); // State to control the popup visibility
   
   // Generate array of 66 images
-  type ImageType = {
-    id: number;
-    src: string;
-    alt: string;
-    rotation: number;
-    yOffset: number;
-  };
-
-  const images: ImageType[] = Array.from({ length: 66 }, (_, i) => ({
+  const images = Array.from({ length: 66 }, (_, i) => ({
     id: i + 1,
     src: `/images/${i + 1}.png`,
     alt: `Ghibli moment ${i + 1}`,
@@ -64,7 +56,7 @@ export default function PolaroidPhotoAlbum() {
     createConfetti();
   }, []);
 
-  const openLightbox = (image: ImageType) => {
+  const openLightbox = (image: { id: number; src: string; alt: string }) => {
     setSelectedImage(image);
     document.body.style.overflow = 'hidden';
   };
@@ -75,12 +67,12 @@ export default function PolaroidPhotoAlbum() {
   };
 
   // Helper function to distribute images evenly across columns
-  const distributeImagesToColumns = (images: ImageType[], columnCount: number): ImageType[][] => {
+  const distributeImagesToColumns = (images: { id: number; src: string; alt: string; rotation: number; yOffset: number; }[], columnCount: number): { id: number; src: string; alt: string; rotation: number; yOffset: number; }[][] => {
     // Create array of column arrays
-    const columns: ImageType[][] = Array.from({ length: columnCount }, () => []);
+    const columns: { id: number; src: string; alt: string; rotation: number; yOffset: number; }[][] = Array.from({ length: columnCount }, () => []);
     
     // Distribute images evenly
-    images.forEach((image: ImageType, index: number) => {
+    images.forEach((image: { id: number; src: string; alt: string; rotation: number; yOffset: number; }, index: number) => {
       const columnIndex = index % columnCount;
       columns[columnIndex].push(image);
     });
@@ -97,17 +89,6 @@ export default function PolaroidPhotoAlbum() {
     setShowPopup(false);
   };
 
-  // Generate floating hearts for the popup
-  const floatingHearts = Array.from({ length: 30 }).map((_, i) => ({
-    id: i,
-    left: Math.random() * 100,
-    top: Math.random() * 100,
-    size: Math.random() * 20 + 10,
-    duration: Math.random() * 5 + 2,
-    delay: Math.random() * 3,
-    emoji: Math.random() > 0.5 ? '❤️' : '💕'
-  }));
-
   return (
     <div className="min-h-screen bg-blue-50 relative overflow-hidden">
       {/* Birthday Popup */}
@@ -117,72 +98,55 @@ export default function PolaroidPhotoAlbum() {
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, type: 'spring' }}
-            className="relative w-11/12 max-w-lg p-8 rounded-lg shadow-lg overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #FFD6EC 0%, #FFADAD 100%)' }}
+            className="relative w-11/12 max-w-md p-8 rounded-lg shadow-lg bg-white border-8 border-pink-300"
+            style={{ 
+              background: 'linear-gradient(135deg, #FFF5F7 0%, #FFF 100%)',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
+            }}
           >
-            {/* Floating hearts and kisses background */}
-            {floatingHearts.map(heart => (
-              <div
-                key={`popup-heart-${heart.id}`}
-                className="absolute text-red-500 pointer-events-none animate-float"
-                style={{
-                  left: `${heart.left}%`,
-                  top: `${heart.top}%`,
-                  fontSize: `${heart.size}px`,
-                  animationDuration: `${heart.duration}s`,
-                  animationDelay: `${heart.delay}s`
-                }}
-              >
-                {heart.emoji}
-              </div>
-            ))}
+            {/* Cute decoration - scalloped edge */}
+            <div className="absolute inset-0 rounded-lg" 
+              style={{
+                backgroundImage: 'radial-gradient(circle at 10px 10px, transparent 12px, #FFC0CB 13px, #FFC0CB 15px, transparent 16px)',
+                backgroundSize: '30px 30px',
+                backgroundPosition: '-15px -15px',
+                pointerEvents: 'none',
+                opacity: 0.3,
+                zIndex: 1
+              }}>
+            </div>
             
-            {/* Header with ribbon effect */}
-            <div className="relative mb-6">
-             
-              <h1 className="text-center font-bold text-4xl text-red-600 relative z-10 text-shadow-sm mb-2">
+            {/* Content */}
+            <div className="text-center px-6 py-4 relative z-10">
+              <h1 className="text-center font-bold text-4xl text-red-600 mb-6">
                 Happy Birthday Babe
               </h1>
-              <div className="w-32 h-1 bg-red-300 mx-auto"></div>
+              
+              <div className="w-32 h-1 bg-pink-300 mx-auto mb-6"></div>
+              
+              <p className="text-lg text-red-700 mb-8">
+                Today is all about celebrating the love of my life!
+              </p>
+              
+              {/* Button */}
+              <motion.button
+                onClick={closePopup}
+                className="mt-4 py-3 px-8 bg-gradient-to-r from-pink-400 to-red-400 text-white rounded-full font-bold shadow-md"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{ 
+                  boxShadow: '0 4px 15px rgba(255, 182, 193, 0.5)'
+                }}
+              >
+                View Ghibli Journey
+              </motion.button>
             </div>
             
-            {/* Hearts around the content */}
-            <div className="relative">
-              {/*<div className="absolute -left-4 top-1/4 text-3xl animate-bounce" style={{ animationDuration: '3s' }}>❤️</div>
-              <div className="absolute -right-4 top-1/2 text-3xl animate-bounce" style={{ animationDuration: '2.5s' }}>💕</div>
-              <div className="absolute left-1/4 -bottom-4 text-3xl animate-bounce" style={{ animationDuration: '2.8s' }}>💖</div>
-              <div className="absolute right-1/4 -top-4 text-3xl animate-bounce" style={{ animationDuration: '3.2s' }}>💓</div>
-              */}
-              {/* Content */}
-              <div className="text-center px-6 py-4">
-                <p className="text-lg text-red-700 mb-6">
-                  Today is all about celebrating the love of my life!
-                </p>
-                
-                {/* Kisses */}
-                <div className="flex justify-center my-4 space-x-2">
-                 {/* <span className="text-2xl animate-pulse">💋</span>
-                  <span className="text-2xl animate-pulse" style={{ animationDelay: '0.3s' }}>💋</span>
-                  <span className="text-2xl animate-pulse" style={{ animationDelay: '0.6s' }}>💋</span> */}
-                </div>
-                
-                {/* Button */}
-                <motion.button
-                  onClick={closePopup}
-                  className="mt-6 py-3 px-8 bg-gradient-to-r from-red-400 to-pink-400 text-white rounded-full font-bold shadow-lg"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  View Ghibli Journey
-                </motion.button>
-              </div>
-            </div>
-            
-            {/* Additional decorative elements */}
-            {/*<div className="absolute bottom-2 left-2 text-xl">💝</div>
-            <div className="absolute bottom-2 right-2 text-xl">💘</div>
-            <div className="absolute top-2 left-2 text-xl">💞</div>
-            <div className="absolute top-2 right-2 text-xl">💗</div> */}
+            {/* Cute corner accents */}
+            <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-pink-400 rounded-tl-lg"></div>
+            <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-pink-400 rounded-tr-lg"></div>
+            <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-pink-400 rounded-bl-lg"></div>
+            <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-pink-400 rounded-br-lg"></div>
           </motion.div>
         </div>
       )}
@@ -415,23 +379,6 @@ export default function PolaroidPhotoAlbum() {
         
         .font-handwriting {
           font-family: 'Handwriting', cursive;
-        }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-10px) rotate(5deg);
-          }
-        }
-        
-        .animate-float {
-          animation: float ease-in-out infinite;
-        }
-        
-        .text-shadow-sm {
-          text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
         }
       `}</style>
     </div>
