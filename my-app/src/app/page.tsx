@@ -16,8 +16,8 @@ export default function PolaroidPhotoAlbum() {
     alt: `Ghibli moment ${i + 1}`,
     // Random rotation for hanging effect (-5 to 5 degrees)
     rotation: Math.floor(Math.random() * 11) - 5,
-    // Vertical position variation (0-30px)
-    yOffset: Math.floor(Math.random() * 30)
+    // Smaller vertical position variation (0-15px) to reduce gaps
+    yOffset: Math.floor(Math.random() * 15)
   }));
 
   useEffect(() => {
@@ -38,7 +38,8 @@ export default function PolaroidPhotoAlbum() {
         const left = Math.random() * 100;
         const animDuration = Math.random() * 3 + 2;
         const animDelay = Math.random() * 5;
-        const colors = ['#FFD700', '#FF6347', '#4682B4', '#9ACD32', '#FF69B4'];
+        // Pastel colors
+        const colors = ['#A7D7C9', '#74B49B', '#5C8D89', '#B6D8F2', '#9AC2C9'];
         const color = colors[Math.floor(Math.random() * colors.length)];
         
         confetti.style.width = `${size}px`;
@@ -66,17 +67,17 @@ export default function PolaroidPhotoAlbum() {
   };
 
   return (
-    <div className="min-h-screen bg-pink-50 relative overflow-hidden">
+    <div className="min-h-screen bg-blue-50 relative overflow-hidden">
       {/* Confetti Container */}
       <div id="confetti-container" className="fixed inset-0 pointer-events-none z-10"></div>
       
       {/* Background Decorations */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {/* Hearts */}
+        {/* Leaves and stars for Ghibli feel */}
         {Array.from({ length: 30 }).map((_, i) => (
           <div 
-            key={`heart-${i}`} 
-            className="absolute text-pink-200"
+            key={`decor-${i}`} 
+            className="absolute text-green-200"
             style={{
               fontSize: `${Math.random() * 30 + 10}px`,
               left: `${Math.random() * 100}%`,
@@ -86,7 +87,7 @@ export default function PolaroidPhotoAlbum() {
               zIndex: 1
             }}
           >
-            ❤️
+            {Math.random() > 0.5 ? '🍃' : '✨'}
           </div>
         ))}
         
@@ -94,7 +95,7 @@ export default function PolaroidPhotoAlbum() {
         {Array.from({ length: 15 }).map((_, i) => (
           <div 
             key={`balloon-${i}`} 
-            className="absolute text-indigo-300 animate-bounce"
+            className="absolute text-blue-300 animate-bounce"
             style={{
               fontSize: `${Math.random() * 40 + 20}px`,
               left: `${Math.random() * 100}%`,
@@ -109,15 +110,42 @@ export default function PolaroidPhotoAlbum() {
         ))}
       </div>
 
-      {/* Header */}
-      <header className="py-8 bg-pink-100 relative z-20 shadow-md">
+      {/* Header with Fancy Birthday Message */}
+      <header className="py-10 bg-gradient-to-r from-blue-200 via-green-100 to-blue-200 relative z-20 shadow-md">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl text-center font-serif text-pink-800">
-            Our Ghibli Journey 🌿
-          </h1>
-          <p className="text-center mt-4 text-xl text-pink-700 font-medium">
-            Happy Birthday, Love ❤️
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <h1 className="text-4xl md:text-5xl text-center font-serif text-teal-800 mb-6">
+              <span className="relative inline-block">
+                <span className="relative z-10">Our Ghibli Journey 🌿</span>
+                <span className="absolute -bottom-1 left-0 w-full h-3 bg-teal-200 opacity-50 rounded-lg z-0"></span>
+              </span>
+            </h1>
+            
+            <div className="relative inline-block px-8 py-4 mb-4 bg-white rounded-lg shadow-lg transform rotate-1">
+              <div className="absolute -top-3 -left-3 w-8 h-8 text-2xl">🎂</div>
+              <div className="absolute -bottom-3 -right-3 w-8 h-8 text-2xl">🎉</div>
+              <motion.p 
+                className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-blue-500 bg-clip-text text-transparent"
+                animate={{ 
+                  scale: [1, 1.05, 1],
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+              >
+                Happy Birthday, Love ❤️
+              </motion.p>
+            </div>
+            
+            <p className="text-teal-700 italic mt-2">Memories we've made together in our magical world</p>
+          </motion.div>
         </div>
       </header>
 
@@ -125,33 +153,33 @@ export default function PolaroidPhotoAlbum() {
       <main className="container mx-auto px-4 py-12 relative z-20">
         {imagesLoaded ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from({ length: Math.ceil(images.length / 4) }).map((_, stringIndex) => (
+            {Array.from({ length: Math.ceil(images.length / 6) }).map((_, stringIndex) => (
               <div key={`string-${stringIndex}`} className="relative">
                 {/* Vertical LED String */}
-                <div className="absolute h-full w-1 bg-yellow-100 left-1/2 transform -translate-x-1/2 z-10"></div>
+                <div className="absolute h-full w-1 bg-teal-100 left-1/2 transform -translate-x-1/2 z-10"></div>
                 
                 {/* LED Bulbs */}
-                {Array.from({ length: 8 }).map((_, bulbIndex) => (
+                {Array.from({ length: 12 }).map((_, bulbIndex) => (
                   <div 
                     key={`bulb-${stringIndex}-${bulbIndex}`}
-                    className="absolute w-4 h-4 rounded-full bg-yellow-300 left-1/2 transform -translate-x-1/2 z-20 animate-pulse"
+                    className="absolute w-4 h-4 rounded-full bg-teal-300 left-1/2 transform -translate-x-1/2 z-20 animate-pulse"
                     style={{
-                      top: `${(bulbIndex * 12.5)}%`,
-                      boxShadow: '0 0 10px 2px rgba(255, 255, 0, 0.5)'
+                      top: `${(bulbIndex * 8.3)}%`,
+                      boxShadow: '0 0 10px 2px rgba(129, 226, 213, 0.6)'
                     }}
                   />
                 ))}
 
                 {/* Polaroid Photos on this string */}
-                {images.slice(stringIndex * 4, (stringIndex + 1) * 4).map((image, index) => (
+                {images.slice(stringIndex * 6, (stringIndex + 1) * 6).map((image, index) => (
                   <motion.div
                     key={image.id}
-                    className="relative bg-white rounded p-3 pt-3 pb-12 shadow-lg mx-auto mb-16 cursor-pointer"
+                    className="relative bg-white rounded p-3 pt-3 pb-12 shadow-lg mx-auto mb-8 cursor-pointer"
                     style={{
                       width: '85%',
                       maxWidth: '300px',
                       transform: `rotate(${image.rotation}deg)`,
-                      marginTop: `${image.yOffset + index * 220}px`,
+                      marginTop: `${image.yOffset + index * 120}px`,
                       zIndex: 30
                     }}
                     initial={{ opacity: 0, y: 20 }}
@@ -166,8 +194,8 @@ export default function PolaroidPhotoAlbum() {
                       style={{ height: '30px' }}
                     />
                     
-                    {/* Picture Area */}
-                    <div className="relative w-full aspect-square mb-2 overflow-hidden" style={{ position: 'relative', width: '100%', height: '0', paddingBottom: '100%' }}>
+                    {/* Picture Area with subtle border */}
+                    <div className="relative w-full aspect-square mb-2 overflow-hidden border-2 border-teal-100">
                       <Image
                         src={image.src}
                         alt={image.alt}
@@ -179,7 +207,7 @@ export default function PolaroidPhotoAlbum() {
                     </div>
                     
                     {/* Polaroid Caption */}
-                    <p className="text-center text-sm font-handwriting text-gray-700">
+                    <p className="text-center text-sm font-handwriting text-teal-700">
                       Memory #{image.id}
                     </p>
                   </motion.div>
@@ -189,14 +217,14 @@ export default function PolaroidPhotoAlbum() {
           </div>
         ) : (
           <div className="flex justify-center items-center h-64">
-            <p className="text-xl text-pink-700">Hanging up your magical moments...</p>
+            <p className="text-xl text-teal-700">Hanging up your magical moments...</p>
           </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="py-6 bg-pink-100 mt-8 relative z-20">
-        <p className="text-center text-pink-700">
+      <footer className="py-6 bg-gradient-to-r from-blue-200 via-green-100 to-blue-200 mt-8 relative z-20">
+        <p className="text-center text-teal-700">
           Created with love, inspired by Studio Ghibli ✨
         </p>
       </footer>
@@ -211,7 +239,7 @@ export default function PolaroidPhotoAlbum() {
             className="relative max-w-4xl max-h-screen"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative w-full h-[80vh]" style={{ position: 'relative', width: '100%', height: '80vh' }}>
+            <div className="relative w-full h-[80vh]">
               <Image
                 src={selectedImage.src}
                 alt={selectedImage.alt}
@@ -230,7 +258,7 @@ export default function PolaroidPhotoAlbum() {
               </svg>
             </button>
             <div className="absolute bottom-4 left-0 right-0 text-center">
-              <span className="bg-white bg-opacity-70 px-4 py-2 rounded-full text-gray-800">
+              <span className="bg-white bg-opacity-70 px-4 py-2 rounded-full text-teal-800">
                 Memory #{selectedImage.id}
               </span>
             </div>
