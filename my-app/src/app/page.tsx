@@ -5,11 +5,20 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 export default function PolaroidPhotoAlbum() {
-  const [selectedImage, setSelectedImage] = useState<{ id: number; src: string; alt: string; rotation: number; yOffset: number } | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ImageType | null>(null);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [showPopup, setShowPopup] = useState(true); // State to control the popup visibility
   
   // Generate array of 66 images
-  const images = Array.from({ length: 66 }, (_, i) => ({
+  type ImageType = {
+    id: number;
+    src: string;
+    alt: string;
+    rotation: number;
+    yOffset: number;
+  };
+
+  const images: ImageType[] = Array.from({ length: 66 }, (_, i) => ({
     id: i + 1,
     src: `/images/${i + 1}.png`,
     alt: `Ghibli moment ${i + 1}`,
@@ -55,7 +64,7 @@ export default function PolaroidPhotoAlbum() {
     createConfetti();
   }, []);
 
-  const openLightbox = (image: { id: number; src: string; alt: string; rotation: number; yOffset: number }) => {
+  const openLightbox = (image: ImageType) => {
     setSelectedImage(image);
     document.body.style.overflow = 'hidden';
   };
@@ -66,12 +75,12 @@ export default function PolaroidPhotoAlbum() {
   };
 
   // Helper function to distribute images evenly across columns
-  const distributeImagesToColumns = (images: { id: number; src: string; alt: string; rotation: number; yOffset: number }[], columnCount: number): { id: number; src: string; alt: string; rotation: number; yOffset: number }[][] => {
+  const distributeImagesToColumns = (images: ImageType[], columnCount: number): ImageType[][] => {
     // Create array of column arrays
-    const columns: { id: number; src: string; alt: string; rotation: number; yOffset: number }[][] = Array.from({ length: columnCount }, () => []);
+    const columns: ImageType[][] = Array.from({ length: columnCount }, () => []);
     
     // Distribute images evenly
-    images.forEach((image: { id: number; src: string; alt: string; rotation: number; yOffset: number }, index: number) => {
+    images.forEach((image: ImageType, index: number) => {
       const columnIndex = index % columnCount;
       columns[columnIndex].push(image);
     });
@@ -83,8 +92,102 @@ export default function PolaroidPhotoAlbum() {
   const columnCount = 3; // We'll handle responsive behavior with grid
   const imageColumns = distributeImagesToColumns(images, columnCount);
 
+  // Function to close the popup
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
+  // Generate floating hearts for the popup
+  const floatingHearts = Array.from({ length: 30 }).map((_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    size: Math.random() * 20 + 10,
+    duration: Math.random() * 5 + 2,
+    delay: Math.random() * 3,
+    emoji: Math.random() > 0.5 ? '❤️' : '💕'
+  }));
+
   return (
     <div className="min-h-screen bg-blue-50 relative overflow-hidden">
+      {/* Birthday Popup */}
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-70">
+          <motion.div 
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, type: 'spring' }}
+            className="relative w-11/12 max-w-lg p-8 rounded-lg shadow-lg overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #FFD6EC 0%, #FFADAD 100%)' }}
+          >
+            {/* Floating hearts and kisses background */}
+            {floatingHearts.map(heart => (
+              <div
+                key={`popup-heart-${heart.id}`}
+                className="absolute text-red-500 pointer-events-none animate-float"
+                style={{
+                  left: `${heart.left}%`,
+                  top: `${heart.top}%`,
+                  fontSize: `${heart.size}px`,
+                  animationDuration: `${heart.duration}s`,
+                  animationDelay: `${heart.delay}s`
+                }}
+              >
+                {heart.emoji}
+              </div>
+            ))}
+            
+            {/* Header with ribbon effect */}
+            <div className="relative mb-6">
+             
+              <h1 className="text-center font-bold text-4xl text-red-600 relative z-10 text-shadow-sm mb-2">
+                Happy Birthday Babe
+              </h1>
+              <div className="w-32 h-1 bg-red-300 mx-auto"></div>
+            </div>
+            
+            {/* Hearts around the content */}
+            <div className="relative">
+              {/*<div className="absolute -left-4 top-1/4 text-3xl animate-bounce" style={{ animationDuration: '3s' }}>❤️</div>
+              <div className="absolute -right-4 top-1/2 text-3xl animate-bounce" style={{ animationDuration: '2.5s' }}>💕</div>
+              <div className="absolute left-1/4 -bottom-4 text-3xl animate-bounce" style={{ animationDuration: '2.8s' }}>💖</div>
+              <div className="absolute right-1/4 -top-4 text-3xl animate-bounce" style={{ animationDuration: '3.2s' }}>💓</div>
+              */}
+              {/* Content */}
+              <div className="text-center px-6 py-4">
+                <p className="text-lg text-red-700 mb-6">
+                  Today is all about celebrating the love of my life!
+                </p>
+                
+                {/* Kisses */}
+                <div className="flex justify-center my-4 space-x-2">
+                 {/* <span className="text-2xl animate-pulse">💋</span>
+                  <span className="text-2xl animate-pulse" style={{ animationDelay: '0.3s' }}>💋</span>
+                  <span className="text-2xl animate-pulse" style={{ animationDelay: '0.6s' }}>💋</span> */}
+                </div>
+                
+                {/* Button */}
+                <motion.button
+                  onClick={closePopup}
+                  className="mt-6 py-3 px-8 bg-gradient-to-r from-red-400 to-pink-400 text-white rounded-full font-bold shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  View Ghibli Journey
+                </motion.button>
+              </div>
+            </div>
+            
+            {/* Additional decorative elements */}
+            {/*<div className="absolute bottom-2 left-2 text-xl">💝</div>
+            <div className="absolute bottom-2 right-2 text-xl">💘</div>
+            <div className="absolute top-2 left-2 text-xl">💞</div>
+            <div className="absolute top-2 right-2 text-xl">💗</div> */}
+          </motion.div>
+        </div>
+      )}
+
+      {/* Original Ghibli Journey Content */}
       {/* Confetti Container */}
       <div id="confetti-container" className="fixed inset-0 pointer-events-none z-10"></div>
       
@@ -189,7 +292,7 @@ export default function PolaroidPhotoAlbum() {
                 ))}
 
                 {/* Polaroid Photos in this column */}
-                {columnImages.map((image: { id: number; src: string; alt: string; rotation: number; yOffset: number }, index) => (
+                {columnImages.map((image, index) => (
                   <motion.div
                     key={image.id}
                     className="relative bg-white rounded p-3 pt-3 pb-12 shadow-lg mx-auto mb-8 cursor-pointer"
@@ -284,7 +387,7 @@ export default function PolaroidPhotoAlbum() {
         </div>
       )}
 
-      {/* CSS for the confetti animation */}
+      {/* CSS for animations and styling */}
       <style jsx global>{`
         @keyframes confettiFall {
           0% {
@@ -312,6 +415,23 @@ export default function PolaroidPhotoAlbum() {
         
         .font-handwriting {
           font-family: 'Handwriting', cursive;
+        }
+        
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-10px) rotate(5deg);
+          }
+        }
+        
+        .animate-float {
+          animation: float ease-in-out infinite;
+        }
+        
+        .text-shadow-sm {
+          text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
         }
       `}</style>
     </div>
