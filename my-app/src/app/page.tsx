@@ -80,10 +80,6 @@ export default function PolaroidPhotoAlbum() {
     return columns;
   };
 
-  // Distribute images into 3 columns (or 2/1 based on screen size)
-  const columnCount = 3; // We'll handle responsive behavior with grid
-  const imageColumns = distributeImagesToColumns(images, columnCount);
-
   // Function to close the popup
   const closePopup = () => {
     setShowPopup(false);
@@ -203,12 +199,12 @@ export default function PolaroidPhotoAlbum() {
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-           <h1 className="text-4xl md:text-5xl text-center font-serif text-teal-800 mb-6">
-  <span className="relative inline-block">
-    <span className="relative z-10">Our Ghibli Journey ✨</span>
-    <span className="absolute -bottom-1 left-0 w-full h-3 bg-teal-200 opacity-50 rounded-lg z-0"></span>
-  </span>
-</h1>
+            <h1 className="text-4xl md:text-5xl text-center font-serif text-teal-800 mb-6">
+              <span className="relative inline-block">
+                <span className="relative z-10">Our Ghibli Journey ✨</span>
+                <span className="absolute -bottom-1 left-0 w-full h-3 bg-teal-200 opacity-50 rounded-lg z-0"></span>
+              </span>
+            </h1>
             
             <div className="relative inline-block px-8 py-4 mb-4 bg-white rounded-lg shadow-lg transform rotate-1">
               <div className="absolute -top-3 -left-3 w-8 h-8 text-2xl">🎂</div>
@@ -233,30 +229,30 @@ export default function PolaroidPhotoAlbum() {
         </div>
       </header>
 
-      {/* String Lights and Photos - Using the new distribution method */}
+      {/* String Lights and Photos - Using a responsive grid system */}
       <main className="container mx-auto px-4 py-12 relative z-20">
         {imagesLoaded ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Create a column for each distributed image set */}
-            {imageColumns.map((columnImages, columnIndex) => (
-              <div key={`column-${columnIndex}`} className="relative">
+          <div>
+            {/* Mobile View - Single Column */}
+            <div className="block sm:hidden">
+              <div className="relative">
                 {/* Vertical LED String */}
                 <div className="absolute h-full w-1 bg-yellow-100 left-1/2 transform -translate-x-1/2 z-10"></div>
                 
-                {/* LED Bulbs - changed to yellow */}
-                {Array.from({ length: 12 }).map((_, bulbIndex) => (
+                {/* LED Bulbs */}
+                {Array.from({ length: Math.ceil(images.length/5) }).map((_, bulbIndex) => (
                   <div 
-                    key={`bulb-${columnIndex}-${bulbIndex}`}
+                    key={`bulb-mobile-${bulbIndex}`}
                     className="absolute w-4 h-4 rounded-full bg-yellow-300 left-1/2 transform -translate-x-1/2 z-20 animate-pulse"
                     style={{
-                      top: `${(bulbIndex * 8.3)}%`,
+                      top: `${(bulbIndex * 5)}%`,
                       boxShadow: '0 0 10px 2px rgba(255, 217, 102, 0.6)' // Yellow glow
                     }}
                   />
                 ))}
 
-                {/* Polaroid Photos in this column */}
-                {columnImages.map((image, index) => (
+                {/* Polaroid Photos in one column for mobile */}
+                {images.map((image, index) => (
                   <motion.div
                     key={image.id}
                     className="relative bg-white rounded p-3 pt-3 pb-12 shadow-lg mx-auto mb-8 cursor-pointer"
@@ -264,12 +260,12 @@ export default function PolaroidPhotoAlbum() {
                       width: '85%',
                       maxWidth: '300px',
                       transform: `rotate(${image.rotation}deg)`,
-                      marginTop: index === 0 ? '0' : `${image.yOffset + 100}px`,
+                      marginTop: index === 0 ? '0' : `${image.yOffset + 70}px`, // Reduced spacing for mobile
                       zIndex: 30
                     }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    transition={{ duration: 0.5, delay: Math.min(index * 0.05, 1.5) }} // Faster loading on mobile
                     onClick={() => openLightbox(image)}
                     whileHover={{ scale: 1.05, rotate: 0 }}
                   >
@@ -285,7 +281,7 @@ export default function PolaroidPhotoAlbum() {
                         src={image.src}
                         alt={image.alt}
                         fill
-                        sizes="300px"
+                        sizes="(max-width: 640px) 85vw, 300px"
                         className="object-cover"
                         loading="lazy"
                       />
@@ -298,7 +294,54 @@ export default function PolaroidPhotoAlbum() {
                   </motion.div>
                 ))}
               </div>
-            ))}
+            </div>
+
+            {/* Tablet/Desktop View - Multiple Columns */}
+            <div className="hidden sm:block">
+              {/* Get columns based on screen size */}
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                {/* Create columns based on screen size */}
+                {(() => {
+                  // For medium screens (sm), use 2 columns
+                  const tabletColumnCount = 2;
+                  const tabletImageColumns = distributeImagesToColumns(images, tabletColumnCount);
+                  
+                  // For large screens (lg), use 3 columns
+                  const desktopColumnCount = 3;
+                  const desktopImageColumns = distributeImagesToColumns(images, desktopColumnCount);
+                  
+                  // Render the columns based on screen size
+                  return Array.from({ length: desktopColumnCount }).map((_, columnIndex) => (
+                    <div key={`column-${columnIndex}`} className="relative">
+                      {/* Vertical LED String */}
+                      <div className="absolute h-full w-1 bg-yellow-100 left-1/2 transform -translate-x-1/2 z-10"></div>
+                      
+                      {/* LED Bulbs */}
+                      {Array.from({ length: 12 }).map((_, bulbIndex) => (
+                        <div 
+                          key={`bulb-${columnIndex}-${bulbIndex}`}
+                          className="absolute w-4 h-4 rounded-full bg-yellow-300 left-1/2 transform -translate-x-1/2 z-20 animate-pulse"
+                          style={{
+                            top: `${(bulbIndex * 8.3)}%`,
+                            boxShadow: '0 0 10px 2px rgba(255, 217, 102, 0.6)' // Yellow glow
+                          }}
+                        />
+                      ))}
+
+                      {/* Polaroid Photos in this column - select from tablet or desktop columns based on screen size */}
+                      {(columnIndex < tabletColumnCount ? 
+                        <div className="sm:block lg:hidden">{tabletImageColumns[columnIndex].map(renderPolaroid)}</div> : 
+                        null
+                      )}
+                      {(columnIndex < desktopColumnCount ? 
+                        <div className="hidden lg:block">{desktopImageColumns[columnIndex].map(renderPolaroid)}</div> : 
+                        null
+                      )}
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
           </div>
         ) : (
           <div className="flex justify-center items-center h-64">
@@ -383,4 +426,49 @@ export default function PolaroidPhotoAlbum() {
       `}</style>
     </div>
   );
+
+  // Helper function to render polaroid images (extracted to avoid duplication)
+  function renderPolaroid(image: any, index: number) {
+    return (
+      <motion.div
+        key={image.id}
+        className="relative bg-white rounded p-3 pt-3 pb-12 shadow-lg mx-auto mb-8 cursor-pointer"
+        style={{
+          width: '85%',
+          maxWidth: '300px',
+          transform: `rotate(${image.rotation}deg)`,
+          marginTop: index === 0 ? '0' : `${image.yOffset + 100}px`,
+          zIndex: 30
+        }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        onClick={() => openLightbox(image)}
+        whileHover={{ scale: 1.05, rotate: 0 }}
+      >
+        {/* String connecting to the vertical string */}
+        <div 
+          className="absolute w-1 bg-gray-300 left-1/2 transform -translate-x-1/2 -top-8" 
+          style={{ height: '30px' }}
+        />
+        
+        {/* Picture Area with subtle border */}
+        <div className="relative w-full aspect-square mb-2 overflow-hidden border-2 border-teal-100">
+          <Image
+            src={image.src}
+            alt={image.alt}
+            fill
+            sizes="(max-width: 640px) 85vw, 300px"
+            className="object-cover"
+            loading="lazy"
+          />
+        </div>
+        
+        {/* Polaroid Caption */}
+        <p className="text-center text-sm font-handwriting text-teal-700">
+          Memory #{image.id}
+        </p>
+      </motion.div>
+    );
+  }
 }
